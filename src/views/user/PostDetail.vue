@@ -105,7 +105,7 @@ const deleteCollection = async () => {
 
 //返回
 const backToForum = async () => {
-  await router.push("/user/forum");
+  await router.back();
 };
 
 //根据id找到发评论者的信息
@@ -211,17 +211,17 @@ const reply = async() => {
             <span class="el-dropdown__box">
                 <el-avatar :src="poster.userPic?poster.userPic:avatar" :size="30"/>
               </span>
-              <div style=" font-size:12px; width:45px;"><strong>{{ poster.nickname }}</strong></div>
-                <div style=" font-size:10px; width:110px;" v-if="post.postTime">
+              <div class="nickname"><strong>{{ poster.nickname }}</strong></div>
+                <div class="post-time" v-if="post.postTime">
                     发布于{{post.postTime.substring(0,10)}}
                 </div>
-                <div style=" font-size:10px; width:70px;" v-if="post.postTime">
+                <div class="post-time-detail" v-if="post.postTime">
                     {{post.postTime.substring(11,20)}}
                 </div>
-                <div style=" font-size:10px; width:60px;">
+                <div class="view-num">
                     浏览量{{post.viewNum}}
                 </div>
-                <div style=" font-size:10px; width:80px;">
+                <div class="coll-num">
                     收藏量{{post.collNum}}
                 </div>
         </div>
@@ -265,11 +265,10 @@ const reply = async() => {
             <div class="publisher-info">
               <div class="name">{{c.nickname}}</div>
               <div class="time">
-                <div style="width:90px;color:grey">{{c.publishTime.substring(0,10)}}</div>
-                <div style="color:grey">{{c.publishTime.substring(11,20)}}</div>
+                <div class="time-date">{{c.publishTime.substring(0,10)}}</div>
+                <div class="time-detail">{{c.publishTime.substring(11,20)}}</div>
               </div>
               <div class="button">
-                <!-- <el-button link @click="showReply()">展开</el-button> -->
                 <el-button link @click="showReplyDrawer(c.id, 2)">回复</el-button>
               </div>
             </div>
@@ -290,8 +289,8 @@ const reply = async() => {
               <div class="publisher-info">
                 <div class="name">{{com.nickname}}</div>
                 <div class="time">
-                  <div style="width:90px;color:grey">{{com.publishTime.substring(0,10)}}</div>
-                  <div style="color:grey">{{com.publishTime.substring(11,20)}}</div>
+                  <div class="time-date">{{com.publishTime.substring(0,10)}}</div>
+                  <div class="time-detail">{{com.publishTime.substring(11,20)}}</div>
                 </div>
                 <div class="button">
                   <el-button link @click="showReplyDrawer(com.id, 3)">回复</el-button>
@@ -322,8 +321,8 @@ const reply = async() => {
                   <div class="publisher-info">
                     <div class="name">{{cc.nickname}}</div>
                     <div class="time">
-                      <div style="width:90px;color:grey">{{cc.publishTime.substring(0,10)}}</div>
-                      <div style="color:grey">{{cc.publishTime.substring(11,20)}}</div>
+                      <div class="time-date">{{cc.publishTime.substring(0,10)}}</div>
+                      <div class="time-detail">{{cc.publishTime.substring(11,20)}}</div>
                     </div>
                     <div class="button">
                       <el-button link @click="showReplyDrawer(cc.id, 3)">回复</el-button>
@@ -465,25 +464,41 @@ const reply = async() => {
     .reply-info{
       .publisher-info{
         display: flex;
-        width: 1100px;
+        align-items: center;
         margin-left: 10px;
         margin-top:-10px;
         .name{
           font-size:15px;
-          width:50px;
+          min-width: 80px;
           display: flex;
           align-items: center;
           margin-top:5px;
+          margin-right: 15px;
         }
         .time{
           display: flex;
           align-items: center;
           margin-top:5px;
           font-size:14px;
-          width: 970px;
+          flex: 1;
+          
+          .time-date {
+            color: grey;
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+          }
+          
+          .time-detail {
+            color: grey;
+            margin-left: 5px;
+            display: flex;
+            align-items: center;
+          }
         }
         .button{
           font-size:14px;
+          margin-left: 10px;
         }
       }
       .content{
@@ -515,25 +530,41 @@ const reply = async() => {
     .comment-info{
       .publisher-info{
         display: flex;
-        width: 1100px;
+        align-items: center;
         margin-left: 10px;
         margin-top:-10px;
         .name{
           font-size:15px;
-          width:50px;
+          min-width: 80px;
           display: flex;
           align-items: center;
           margin-top:5px;
+          margin-right: 15px;
         }
         .time{
           display: flex;
           align-items: center;
           margin-top:5px;
           font-size:14px;
-          width: 990px;
+          flex: 1;
+          
+          .time-date {
+            color: grey;
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+          }
+          
+          .time-detail {
+            color: grey;
+            margin-left: 5px;
+            display: flex;
+            align-items: center;
+          }
         }
         .button{
           font-size:14px;
+          margin-left: 10px;
         }
       }
       .content{
@@ -609,7 +640,6 @@ img {
   width:1150px;
   height:40px;
   border-radius:15px;
-    
 
   .el-dropdown__box {
     margin-left: 15px;
@@ -626,6 +656,46 @@ img {
     &:focus {
       outline: none;
     }
+  }
+
+  .nickname {
+    font-size: 12px;
+    margin-left: 10px;
+    min-width: 60px;
+    display: flex;
+    align-items: center;
+  }
+
+  .post-time {
+    font-size: 10px;
+    margin-left: 15px;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+  }
+
+  .post-time-detail {
+    font-size: 10px;
+    margin-left: 5px;
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+  }
+
+  .view-num {
+    font-size: 10px;
+    margin-left: 10px;
+    min-width: 70px;
+    display: flex;
+    align-items: center;
+  }
+
+  .coll-num {
+    font-size: 10px;
+    margin-left: 10px;
+    min-width: 80px;
+    display: flex;
+    align-items: center;
   }
 }
 

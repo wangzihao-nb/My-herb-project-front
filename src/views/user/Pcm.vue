@@ -66,9 +66,30 @@ const clearData = () => {
 
 const question = ref("");
 const answer = ref("");
+const loading = ref(false);
+const dots = ref("");
 const recommend = async() => {
-  let result = await pcmRecommendService(question.value);
-  answer.value = result.data;
+  loading.value = true;
+  answer.value = "";
+  
+  let dotInterval = setInterval(() => {
+    dots.value = dots.value.length >= 6 ? "" : dots.value + ".";
+  }, 300);
+  
+  try {
+    let result = await pcmRecommendService(question.value);
+    let text = result.data;
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+    text = text.replace(/\n+/g, '<br>');
+    answer.value = text;
+  } catch (error) {
+    answer.value = "推荐失败，请稍后重试";
+  } finally {
+    clearInterval(dotInterval);
+    loading.value = false;
+    dots.value = "";
+  }
 }
 
 </script>
@@ -240,22 +261,43 @@ const recommend = async() => {
           </div>
     </div>
 
-      <div style="width: 300px;">
-        <div style="margin: 30px 20px;">
-          <div style="background-color: #EEEEEE;height: 40px;display: flex;">
-            <div style="font-size: 16px;line-height: 40px;font-weight: 600;margin-left: 10px;">
-              中成药智能推荐
-              <div>
-                <el-input v-model="question" placeholder="请输入病症，例如：咳嗽痰多"/>
-                <el-button @click="recommend()" style="margin-bottom:5px;">确定</el-button>
-                <el-input type="textarea" v-model="answer" rows="25"/>
-              </div>
-
-            </div>
+      <div class="recommend-panel">
+        <div class="recommend-header">
+          <div class="recommend-title">
+            <span>中成药智能推荐</span>
           </div>
-        
         </div>
- 
+        <div class="recommend-content">
+          <div class="input-section">
+            <el-input 
+              v-model="question" 
+              placeholder="请输入病症，例如：咳嗽痰多"
+              class="recommend-input"
+              clearable
+            />
+            <el-button 
+              @click="recommend()" 
+              type="primary"
+              class="recommend-button"
+              :loading="loading"
+              :disabled="loading"
+            >
+              确定
+            </el-button>
+          </div>
+          <div class="answer-section">
+            <div class="answer-label">推荐结果：</div>
+            <div v-if="loading" class="loading-container">
+              <div class="loading-text">正在生成结果{{ dots }}</div>
+              <div class="loading-spinner"></div>
+            </div>
+            <div 
+              v-else
+              class="answer-textarea"
+              v-html="answer"
+            ></div>
+          </div>
+        </div>
       </div>
 
 </div>
@@ -336,6 +378,137 @@ const recommend = async() => {
     line-height: 23px;
     color: gray;
     font-size:13px;
+  }
+
+  .recommend-panel {
+    width: 380px;
+    background-color: #FFF8DC;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-top: 20px;
+  }
+
+  .recommend-header {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    padding: 15px 20px;
+    border-bottom: 2px solid #D2691E;
+  }
+
+  .recommend-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+
+  .recommend-content {
+    padding: 30px;
+    background-color: #FFF8DC;
+  }
+
+  .input-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .recommend-input {
+    flex: 1;
+  }
+
+  .recommend-button {
+    background-color: #8B4513;
+    border-color: #8B4513;
+    font-weight: 600;
+    min-width: 80px;
+  }
+
+  .recommend-button:hover {
+    background-color: #A0522D;
+    border-color: #A0522D;
+  }
+
+  .answer-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .answer-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #8B4513;
+    margin-bottom: 5px;
+  }
+
+  .answer-textarea {
+    min-height: 800px;
+    background-color: #FFF8DC;
+    border: 2px solid #8B4513;
+    border-radius: 8px;
+    padding: 15px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+    overflow-y: auto;
+    box-shadow: inset 0 1px 3px rgba(139, 69, 19, 0.1);
+  }
+
+  .answer-textarea strong {
+    font-weight: bold;
+    color: #8B4513;
+  }
+
+  .answer-textarea:focus {
+    border-color: #A0522D;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.15);
+  }
+
+  .loading-container {
+    min-height: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #FFF8DC;
+    border: 2px solid #8B4513;
+    border-radius: 8px;
+    box-shadow: inset 0 1px 3px rgba(139, 69, 19, 0.1);
+  }
+
+  .loading-text {
+    font-size: 16px;
+    color: #8B4513;
+    font-weight: 600;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #D2691E;
+    border-top: 4px solid #8B4513;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .recommend-input :deep(.el-input__wrapper) {
+    border-radius: 8px;
+    border: 2px solid #8B4513;
+    background-color: #FFF8DC;
+    box-shadow: inset 0 1px 3px rgba(139, 69, 19, 0.1);
+  }
+
+  .recommend-input :deep(.el-input__wrapper):focus {
+    border-color: #A0522D;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.15);
   }
 }
 

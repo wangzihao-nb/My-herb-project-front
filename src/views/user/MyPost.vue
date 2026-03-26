@@ -155,7 +155,7 @@ const addPost = async () => {
                 </div> 
                 </div>
                 
-                <div style="display: flex;color: #cccccc;line-height: 40px;margin-bottom:-10px;" @click="detail(p.id)">
+                <div style="display: flex;color: #cccccc;line-height: 30px;margin-top: 10px;" @click="detail(p.id)">
                 <span style="color:grey">{{p.postTime.substring(0,10)}} {{p.postTime.substring(11,20)}}</span>
                 <span style="margin-left: 10px;color:grey">{{p.viewNum}}人浏览过</span>
                 </div>
@@ -315,7 +315,8 @@ const addPost = async () => {
     /* autoprefixer: off */
     -webkit-box-orient:vertical;
     /* autoprefixer: on */
-    -webkit-line-clamp:2;  
+    -webkit-line-clamp:2;
+    line-clamp: 2;
     line-height: 25px;
     color: gray;
   }

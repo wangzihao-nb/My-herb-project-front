@@ -301,8 +301,7 @@ const deletePost = async (postId) => {
               <span class="icon-active"><i class="el-icon-alarm-clock el-icon--right"></i>{{p.postTime.substring(0,10)}} {{p.postTime.substring(11,20)}}</span>
               <span class="icon-active" icon="el-icon-link" style="margin-left: 10px;"><i class="el-icon-view el-icon--right"></i>{{p.viewNum}}人浏览过</span>
             </div>
-            <div @click="detail(p.id)" class="content">
-              {{p.content}}
+            <div @click="detail(p.id)" class="content" v-html="p.content">
             </div>
           </div>
         </div>
